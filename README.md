@@ -12,7 +12,16 @@
 Documentation: [English version](https://github.com/luolongfei/freenom/blob/main/README_EN.md) | 中文版
 </div>
 
-[📢 注意](#-注意)
+Freenom 已经加上了 AWS WAF CAPTCHA 用于各个页面的验证，目前脚本追加了重试机制，可在 `.env` 中自行修改 `MAX_REQUEST_RETRY_COUNT`的值以配置最大重试次数，默认最多重试 200 次，每次至少休眠 20 秒，第 5 次后每次休眠时间根据重试次数递增。 **目前基本能 100% 自动续期成功** 。更多消息可在热心网友的电报群内交流。
+[https://t.me/freenom_auto_renew](https://t.me/freenom_auto_renew)
+
+如果你需要一台高性价比的服务器，可以参考 [美国便宜 VPS](https://go.llfapp.com/cc)
+
+这台 VPS IP 干净，解锁奈飞迪斯尼，适合落地：
+
+<a href="https://go.llfapp.com/cc"><img src="https://images.llfapp.com/cc.png" alt="cc.png" border="0" width="380px" height="320px" /></a>
+
+[📢 公告](#-公告)
 
 [🌿 特别感谢 Special Thanks](#-特别感谢-special-thanks)
 
@@ -34,7 +43,7 @@ Documentation: [English version](https://github.com/luolongfei/freenom/blob/main
 
 [🧪 通过 Mogenius 部署](#-通过-Mogenius-部署)（已不可行）
 
-[☁ 通过 各种云函数 部署](#-通过各种云函数部署)
+[☁ 通过 各种云函数 部署](#-通过各种云函数部署) （目前各平台已开启收费模式，已放弃支持）
 
 [🚧 直接拉取源码部署](#-直接拉取源码部署)
 
@@ -58,13 +67,8 @@ Documentation: [English version](https://github.com/luolongfei/freenom/blob/main
 
 [🥝 开源协议](#-开源协议)
 
-### 📢 注意
+### 📢 公告
 
-- 之前因为 GitHub Action 事件导致本项目被封禁，而后我短暂将项目转移到了 https://github.com/luolongfei/next-freenom
-  仓库，然后在 [@Mattraks](https://github.com/Mattraks) 的提醒下，通过特别的方式恢复了本仓库。
-- 本次封禁导致的直接后果是以前的`issues`全部丢失，以及近`1.8k`的`star`数重新归零，在动力上面确实有受到影响，不过也不会有太大影响，本项目依然长期维护，如果项目有帮到你，欢迎 star。
-- 狡兔三窟，临时仓库 https://github.com/luolongfei/next-freenom 也是备用仓库，如若本仓库再次失联，可以移步到备用仓库获取最新消息，正常情况下以后的开发维护依然在本仓库进行。
-- 推荐 [🐳 通过 Docker 方式部署](#-通过-docker-部署)。如果你没有自己的服务器，可参考本文档 [📦 通过 Koyeb 部署](#-通过-Koyeb-部署) 。
 - 热心网友创建了`Freenom 续期事务局`群组，可供交流、测试、反馈， **加入可直接访问 [https://t.me/freenom_auto_renew](https://t.me/freenom_auto_renew) ，或者扫码加入：**
 
 <a href="https://t.me/freenom_auto_renew"><img src="https://s2.loli.net/2022/10/11/k4sSoXqMVfpIY3d.png" alt="freenom_tg_group.png" border="0" width="220px" height="280px" /></a>
@@ -338,9 +342,10 @@ docker run -d --name freenom --restart always -v $(pwd):/conf -v $(pwd)/logs:/ap
 | TELEGRAM_BOT_TOKEN | 你的`Telegram bot`的`token` |  -  |  否   ||
 | TELEGRAM_BOT_ENABLE | 是否启用`Telegram Bot`推送功能 | `0` |  否   |    `1`：启用<br>`0`：不启用<br>默认不启用，如果设为`1`，则必须设置上面的`TELEGRAM_CHAT_ID`和`TELEGRAM_BOT_TOKEN`变量     |
 | NOTICE_FREQ | 通知频率 | `1` |  否   |                                 `0`：仅当有续期操作的时候<br>`1`：每次执行                                  |
-| NEZHA_SERVER | 哪吒探针服务端的 IP 或域名 |  -  |  否   |
-| NEZHA_PORT | 哪吒探针服务端的端口 |  -  |  否   |  
-| NEZHA_KEY | 哪吒探针客户端专用 Key |  -  |  否   |  
+| NEZHA_SERVER | 哪吒探针服务端的 IP 或域名 |  -  |  否   ||
+| NEZHA_PORT | 哪吒探针服务端的端口 |  -  |  否   ||
+| NEZHA_KEY | 哪吒探针客户端专用 Key |  -  |  否   ||
+| NEZHA_TLS | 哪吒客户SSL/TLS加密 |  -  |  否   |  `1`：启用<br>`0`：不启用  |
 
 **更多配置项含义，请参考 [.env.example](https://github.com/luolongfei/freenom/blob/main/.env.example) 文件中的注释。**
 
@@ -444,7 +449,7 @@ systemctl restart docker
 
 **在看完上行文档的具体内容，并且你确定你行后**，便可点击下方按钮，尝试一键部署：
 
-[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=docker&name=freenom&ports=80;http;/&env[FF_TOKEN]=20190214&env[SHOW_SERVER_INFO]=1&env[MOSAIC_SENSITIVE_INFO]=1&env[FREENOM_USERNAME]=&env[FREENOM_PASSWORD]=&env[MULTIPLE_ACCOUNTS]=&env[TELEGRAM_CHAT_ID]=&env[TELEGRAM_BOT_TOKEN]=&env[TELEGRAM_BOT_ENABLE]=0&env[TOKEN_OR_URL]=[OPTION]%20Token%20or%20URL&env[NEZHA_SERVER]=[OPTION]%20Nezha%20server&env[NEZHA_PORT]=[OPTION]%20Nezha%20port&env[NEZHA_KEY]=[OPTION]%20Nezha%20key&image=docker.io/luolongfei/freenom:koyeb)
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=docker&name=freenom&ports=80;http;/&env[FF_TOKEN]=20190214&env[SHOW_SERVER_INFO]=1&env[MOSAIC_SENSITIVE_INFO]=1&env[FREENOM_USERNAME]=&env[FREENOM_PASSWORD]=&env[MULTIPLE_ACCOUNTS]=&env[TELEGRAM_CHAT_ID]=&env[TELEGRAM_BOT_TOKEN]=&env[TELEGRAM_BOT_ENABLE]=0&env[NEZHA_SERVER]=[OPTION]%20Nezha%20server&env[NEZHA_PORT]=[OPTION]%20Nezha%20port&env[NEZHA_KEY]=[OPTION]%20Nezha%20key&env[NEZHA_TLS]=[OPTION]%20Enable%20tls&image=docker.io/luolongfei/freenom:koyeb)
 
 ***
 
@@ -542,11 +547,9 @@ PayPal: [https://www.paypal.me/mybsdc](https://www.paypal.me/mybsdc)
 
 - 解决 企业微信 因送信内容过长被截断问题
 
-#### [v0.5.1](https://github.com/luolongfei/freenom/releases/tag/v0.5.1) - 2022-08-29
+#### [v0.5.4](https://github.com/luolongfei/freenom/releases/tag/v0.5.4) - 2023-12-13
 
-- 支持一键部署至 Koyeb、Heroku 等平台，虽然 Heroku 马上要收费了，但 Koyeb 依然免费
-- 优化在各种环境下的目录读写权限判断
-- 支持给日志或者命令行输出内容中的敏感信息打马赛克，默认不启用
+- 重试次数默认改为 200 次
 
 ### 🍅 本项目的其它语言实现
 
